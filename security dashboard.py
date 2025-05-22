@@ -49,7 +49,7 @@ if uploaded_file is not None:
         st.pyplot(fig1)
 
     with col2:
-        st.subheader("Rule Distribution - Last 7 Days")
+        st.subheader("Last 7 Days")
         fig2, ax2 = plt.subplots()
         # Apply font size change using textprops
         ax2.pie(
