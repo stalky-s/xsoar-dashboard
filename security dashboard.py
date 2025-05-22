@@ -42,21 +42,21 @@ if uploaded_file is not None:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("🥧 Rule Distribution Today")
+        st.subheader("Rule Distribution Today")
         fig1, ax1 = plt.subplots()
         ax1.pie(counts_today["Count"], labels=counts_today["Rule Name"], autopct='%1.1f%%', startangle=140)
         ax1.axis("equal")
         st.pyplot(fig1)
 
     with col2:
-        st.subheader("🥧 Rule Distribution - Last 7 Days")
+        st.subheader("Rule Distribution - Last 7 Days")
         fig2, ax2 = plt.subplots()
         ax2.pie(counts_week["Count"], labels=counts_week["Rule Name"], autopct='%1.1f%%', startangle=140)
         ax2.axis("equal")
         st.pyplot(fig2)
 
     # --- Line Plot ---
-    st.subheader("📈 Rule Triggers Over the Last 7 Days")
+    st.subheader("Rule Triggers Over the Last 7 Days")
     df_week["date"] = df_week[DATE_COLUMN].dt.date
     trend = df_week.groupby(["date", RULE_COLUMN]).size().unstack(fill_value=0)
 
