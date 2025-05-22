@@ -1,70 +1,72 @@
-# 📦 Imports
 import pandas as pd
+import streamlit as st
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from IPython.display import display, HTML
 
-# 📁 Upload Excel File
-from google.colab import files
-uploaded = files.upload()  # Upload 'security_logs.xlsx'
+# --- App Title ---
+st.set_page_config(page_title="Security Dashboard", layout="centered")
+st.title("🔐 Security Rule Monitoring Dashboard")
 
-# 📂 Load Excel
-EXCEL_FILE = "security_logs.xlsx"
-DATE_COLUMN = "timestamp"
-RULE_COLUMN = "rulename"
+# --- Upload Excel File ---
+uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
 
-df = pd.read_excel(EXCEL_FILE, engine='openpyxl')
-df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
-df = df.dropna(subset=[RULE_COLUMN])
+if uploaded_file is not None:
+    df = pd.read_excel(uploaded_file, engine='openpyxl')
 
-# 📅 Date Filtering
-today = pd.Timestamp.today().normalize()
-last_7_days = today - timedelta(days=7)
+    DATE_COLUMN = "timestamp"
+    RULE_COLUMN = "rulename"
 
-df_today = df[df[DATE_COLUMN] >= today]
-df_week = df[df[DATE_COLUMN] >= last_7_days]
+    df[DATE_COLUMN] = pd.to_datetime(df[DATE_COLUMN])
+    df = df.dropna(subset=[RULE_COLUMN])
 
-# 📊 Summary Function
-def rule_summary(data, label):
-    counts = data[RULE_COLUMN].value_counts().reset_index()
-    counts.columns = ['Rule Name', 'Count']
-    counts['Period'] = label
-    return counts
+    today = pd.Timestamp.today().normalize()
+    last_7_days = today - timedelta(days=7)
 
-counts_today = rule_summary(df_today, "Today")
-counts_week = rule_summary(df_week, "Last 7 Days")
+    df_today = df[df[DATE_COLUMN] >= today]
+    df_week = df[df[DATE_COLUMN] >= last_7_days]
 
-# 🌐 Styled Header
-display(HTML("<h1 style='color:#2c3e50;'>🔐 Security Rule Monitoring Dashboard</h1>"))
+    def get_rule_counts(data, label):
+        counts = data[RULE_COLUMN].value_counts().reset_index()
+        counts.columns = ["Rule Name", "Count"]
+        counts["Period"] = label
+        return counts
 
-# 📋 Show Tables
-display(HTML("<h2 style='color:#34495e;'>📅 Rule Triggers Today</h2>"))
-display(counts_today)
+    counts_today = get_rule_counts(df_today, "Today")
+    counts_week = get_rule_counts(df_week, "Last 7 Days")
+    summary_df = pd.concat([counts_today, counts_week])
 
-display(HTML("<h2 style='color:#34495e;'>🗓️ Rule Triggers - Last 7 Days</h2>"))
-display(counts_week)
+    st.subheader("📋 Rule Trigger Summary")
+    st.dataframe(summary_df, use_container_width=True)
 
-# 📈 Line Plot for Trend
-df_week['date'] = df_week[DATE_COLUMN].dt.date
-daily_counts = df_week.groupby(['date', RULE_COLUMN]).size().unstack(fill_value=0)
+    # --- Pie Charts ---
+    col1, col2 = st.columns(2)
 
-plt.figure(figsize=(10, 5))
-daily_counts.plot(marker='o', linewidth=2)
-plt.title("📈 Daily Rule Triggers (Last 7 Days)", fontsize=14)
-plt.xlabel("Date")
-plt.ylabel("Trigger Count")
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+    with col1:
+        st.subheader("🥧 Rule Distribution Today")
+        fig1, ax1 = plt.subplots()
+        ax1.pie(counts_today["Count"], labels=counts_today["Rule Name"], autopct='%1.1f%%', startangle=140)
+        ax1.axis("equal")
+        st.pyplot(fig1)
 
-# 🥧 Pie Charts
-def plot_pie(counts_df, title):
-    plt.figure(figsize=(6, 6))
-    plt.pie(counts_df['Count'], labels=counts_df['Rule Name'], autopct='%1.1f%%', startangle=140)
-    plt.axis('equal')
-    plt.title(title, fontsize=13)
+    with col2:
+        st.subheader("🥧 Rule Distribution - Last 7 Days")
+        fig2, ax2 = plt.subplots()
+        ax2.pie(counts_week["Count"], labels=counts_week["Rule Name"], autopct='%1.1f%%', startangle=140)
+        ax2.axis("equal")
+        st.pyplot(fig2)
+
+    # --- Line Plot ---
+    st.subheader("📈 Rule Triggers Over the Last 7 Days")
+    df_week["date"] = df_week[DATE_COLUMN].dt.date
+    trend = df_week.groupby(["date", RULE_COLUMN]).size().unstack(fill_value=0)
+
+    fig3, ax3 = plt.subplots(figsize=(8, 4))
+    trend.plot(ax=ax3, marker='o')
+    plt.xlabel("Date")
+    plt.ylabel("Count")
+    plt.title("Rule Triggers per Day")
     plt.tight_layout()
-    plt.show()
+    st.pyplot(fig3)
 
-plot_pie(counts_today, "🥧 Rule Distribution Today")
-plot_pie(counts_week, "🥧 Rule Distribution - Last 7 Days")
+else:
+    st.info("Please upload a valid `.xlsx` file to begin.")
