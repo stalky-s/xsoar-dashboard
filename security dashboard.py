@@ -57,7 +57,7 @@ if uploaded_file is not None:
             labels=counts_week["Rule Name"],
             autopct='%1.1f%%',
             startangle=140,
-            textprops={'fontsize': 6}  # 👈 change this number to adjust size
+            textprops={'fontsize': 20}  # 👈 change this number to adjust size
         )
         
         ax2.axis("equal")
