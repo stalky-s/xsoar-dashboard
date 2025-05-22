@@ -51,7 +51,15 @@ if uploaded_file is not None:
     with col2:
         st.subheader("Rule Distribution - Last 7 Days")
         fig2, ax2 = plt.subplots()
-        ax2.pie(counts_week["Count"], labels=counts_week["Rule Name"], autopct='%1.1f%%', startangle=140)
+        # Apply font size change using textprops
+        ax2.pie(
+            counts_week["Count"],
+            labels=counts_week["Rule Name"],
+            autopct='%1.1f%%',
+            startangle=140,
+            textprops={'fontsize': 12}  # 👈 change this number to adjust size
+        )
+        
         ax2.axis("equal")
         st.pyplot(fig2)
 
