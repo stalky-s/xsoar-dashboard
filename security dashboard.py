@@ -64,7 +64,7 @@ if uploaded_file is not None:
         st.pyplot(fig2)
 
     # --- Line Plot ---
-    st.subheader("Rule Triggers Over the Last 7 Days")
+    st.subheader("Rule Triggers (Last 7 Days)")
     df_week["date"] = df_week[DATE_COLUMN].dt.date
     trend = df_week.groupby(["date", RULE_COLUMN]).size().unstack(fill_value=0)
 
