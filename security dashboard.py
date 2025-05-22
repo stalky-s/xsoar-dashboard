@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 # --- App Title ---
 st.set_page_config(page_title="Security Dashboard", layout="centered")
-st.title("🔐 Security Rule Monitoring Dashboard")
+st.title("XSOAR Dashboard SOC")
 
 # --- Upload Excel File ---
 uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
