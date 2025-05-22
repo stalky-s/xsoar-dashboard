@@ -35,21 +35,21 @@ if uploaded_file is not None:
     counts_week = get_rule_counts(df_week, "Last 7 Days")
     summary_df = pd.concat([counts_today, counts_week])
 
-    st.subheader("📋 Rule Trigger Summary")
+    st.subheader("Rule Trigger Summary")
     st.dataframe(summary_df, use_container_width=True)
 
     # --- Pie Charts ---
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Rule Distribution Today")
+        st.subheader("Rules Today")
         fig1, ax1 = plt.subplots()
         ax1.pie(counts_today["Count"], labels=counts_today["Rule Name"], autopct='%1.1f%%', startangle=140, textprops={'fontsize': 12})
         ax1.axis("equal")
         st.pyplot(fig1)
 
     with col2:
-        st.subheader("Last 7 Days")
+        st.subheader("Rules Last 7 Days")
         fig2, ax2 = plt.subplots()
         # Apply font size change using textprops
         ax2.pie(
